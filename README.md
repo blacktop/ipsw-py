@@ -1,8 +1,31 @@
-# `ipsw` SDK for Python 🚧
+<p align="center">
+  <h1 align="center">ipsw-py</h1>
+  <h4><p align="center"><code>ipsw</code> SDK for Python 🚧</p></h4>
+  <p align="center">
+    <a href="https://github.com/blacktop/ipsw-py/actionss" alt="Actions">
+          <img src="https://github.com/blacktop/ipsw-py/actions/workflows/python-publish.yml/badge.svg" /></a>
+</p>
+<br>
 
-> A Python library for the [ipsw](https://github.com/blacktop/ipsw) Engine API
+## `NOTE:` This is a work in progress
 
----
+## Installing
+
+The latest stable version is [available on PyPI](https://pypi.org/project/ipsw/). Either add `ipsw` to your `requirements.txt` file or install with **pip**:
+
+```bash
+pip install ipsw
+```
+
+## Geting Started
+
+```python
+import ipsw
+
+client = docker.from_env()
+info = client.Info("iPhone15,2_16.4_20E246_Restore.ipsw")
+print(info)
+```
 
 ## Community
 
