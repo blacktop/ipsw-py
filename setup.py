@@ -77,5 +77,4 @@ setup(
         'License :: OSI Approved :: Apache Software License',
     ],
     maintainer='Blacktop',
-    maintainer_email='mastodon.social/@blacktop',
 )
