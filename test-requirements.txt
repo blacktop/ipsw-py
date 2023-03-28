@@ -1,4 +1,4 @@
-setuptools==65.5.1
+setuptools==67.6.1
 coverage==6.4.2
 flake8==4.0.1
 pytest==7.1.2
