@@ -22,7 +22,7 @@ pip install ipsw
 ```python
 import ipsw
 
-client = docker.from_env()
+client = ipsw.from_env()
 info = client.Info("iPhone15,2_16.4_20E246_Restore.ipsw")
 print(info)
 ```
