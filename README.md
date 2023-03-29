@@ -4,6 +4,12 @@
   <p align="center">
     <a href="https://github.com/blacktop/ipsw-py/actionss" alt="Actions">
           <img src="https://github.com/blacktop/ipsw-py/actions/workflows/python-publish.yml/badge.svg" /></a>
+    <a href="https://pypi.org/project/ipsw/" alt="PyPi - Package">
+          <img src="https://img.shields.io/pypi/v/ipsw.svg" /></a>    
+    <a href="https://pypi.org/project/ipsw/" alt="PyPi - Downloads">    
+          <img alt="PyPI - Downloads" src="https://img.shields.io/pypi/dm/ipsw?color=orange"></a>      
+    <a href="http://doge.mit-license.org" alt="LICENSE">
+          <img src="https://img.shields.io/:license-mit-blue.svg" /></a>          
 </p>
 <br>
 
