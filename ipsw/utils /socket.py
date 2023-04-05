@@ -71,8 +71,6 @@ def next_frame_header(socket):
     """
     Returns the stream and size of the next frame of data waiting to be read
     from socket, according to the protocol defined here:
-
-    https://docs.docker.com/engine/api/v1.24/#attach-to-a-container
     """
     try:
         data = read_exactly(socket, 8)

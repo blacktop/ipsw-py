@@ -18,14 +18,12 @@ class Config(Model):
         Remove this config.
 
         Raises:
-            :py:class:`docker.errors.APIError`
+            :py:class:`ipsw.errors.APIError`
                 If config failed to remove.
         """
         return self.client.api.remove_config(self.id)
 
-
-class ConfigCollection(Collection):
-    """Configs on the Docker server."""
+    """Configs on the ipsw server."""
     model = Config
 
     def create(self, **kwargs):
@@ -44,9 +42,9 @@ class ConfigCollection(Collection):
             (:py:class:`Config`): The config.
 
         Raises:
-            :py:class:`docker.errors.NotFound`
+            :py:class:`ipsw.errors.NotFound`
                 If the config does not exist.
-            :py:class:`docker.errors.APIError`
+            :py:class:`ipsw.errors.APIError`
                 If the server returns an error.
         """
         return self.prepare_model(self.client.api.inspect_config(config_id))
