@@ -26,9 +26,6 @@ class ProxyConfig(dict):
         '''
         Instantiate a new ProxyConfig from a dictionary that represents a
         client configuration, as described in `the documentation`_.
-
-        .. _the documentation:
-            https://docs.docker.com/network/proxy/#configure-the-docker-client
         '''
         return ProxyConfig(
             http=config.get('httpProxy'),

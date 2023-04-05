@@ -51,7 +51,7 @@ class Config(Model):
 
     def list(self, **kwargs):
         """
-        List configs. Similar to the ``docker config ls`` command.
+        List configs. Similar to the ``ipsw config ls`` command.
 
         Args:
             filters (dict): Server-side list filtering options.
@@ -60,7 +60,7 @@ class Config(Model):
             (list of :py:class:`Config`): The configs.
 
         Raises:
-            :py:class:`docker.errors.APIError`
+            :py:class:`ipsw.errors.APIError`
                 If the server returns an error.
         """
         resp = self.client.api.configs(**kwargs)
