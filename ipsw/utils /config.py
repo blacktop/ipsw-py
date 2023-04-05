@@ -1,4 +1,4 @@
-import json
+import yaml
 import logging
 import os
 
@@ -54,7 +54,7 @@ def load_general_config(config_path=None):
 
     try:
         with open(config_file) as f:
-            return json.load(f)
+            return yaml.load(f)
     except (OSError, ValueError) as e:
         log.debug(e)
 
