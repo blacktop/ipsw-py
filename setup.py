@@ -10,15 +10,16 @@ ROOT_DIR = os.path.dirname(__file__)
 SOURCE_DIR = os.path.join(ROOT_DIR)
 
 requirements = [
-    'packaging >= 14.0',
-    'requests >= 2.26.0',
-    'urllib3 >= 1.26.0',
-    'websocket-client >= 0.32.0',
+    'packaging >= 23.0',
+    'requests >= 2.28.2',
+    'urllib3 >= 1.26.15',
+    'websocket-client >= 1.5.1',
+    'pyyaml >= 6.0',
 ]
 
 extras_require = {
     # win32 APIs if on Windows (required for npipe support)
-    ':sys_platform == "win32"': 'pywin32>=304',
+    ':sys_platform == "win32"': 'pywin32>=306',
 
     # This is now a no-op, as similarly the requests[security] extra is
     # a no-op as of requests 2.26.0, this is always available/by default now
@@ -26,7 +27,7 @@ extras_require = {
     'tls': [],
 
     # Only required when connecting using the ssh:// protocol
-    'ssh': ['paramiko>=2.4.3'],
+    'ssh': ['paramiko>=3.1.0'],
 }
 
 with open('./test-requirements.txt') as test_reqs_txt:
