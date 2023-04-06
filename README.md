@@ -29,7 +29,7 @@ pip install ipsw
 import ipsw
 
 client = ipsw.from_env()
-info = client.Info("iPhone15,2_16.4_20E246_Restore.ipsw")
+info = client.ipsw_info("iPhone15,2_16.4_20E246_Restore.ipsw")
 print(info)
 ```
 
