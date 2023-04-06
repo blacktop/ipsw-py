@@ -58,20 +58,6 @@ class DaemonApiMixin:
 
     #     return types.CancellableStream(stream, response)
 
-    def info(self):
-        """
-        Display system-wide information. Identical to the ``ipsw info``
-        command.
-
-        Returns:
-            (dict): The info as a dict
-
-        Raises:
-            :py:class:`ipsw.errors.APIError`
-                If the server returns an error.
-        """
-        return self._result(self._get(self._url("/info")), True)
-
     def ping(self):
         """
         Checks the server is responsive. An exception will be raised if it
@@ -86,7 +72,7 @@ class DaemonApiMixin:
         """
         return self._result(self._get(self._url('/_ping'))) == 'OK'
 
-    def version(self, api_version=True):
+    def version(self):
         """
         Returns version information from the server. Similar to the ``ipsw
         version`` command.
@@ -98,5 +84,5 @@ class DaemonApiMixin:
             :py:class:`ipsw.errors.APIError`
                 If the server returns an error.
         """
-        url = self._url("/version", versioned_api=api_version)
+        url = self._url("/version")
         return self._result(self._get(url), json=True)

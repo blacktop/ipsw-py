@@ -20,6 +20,7 @@ from ..utils.json_stream import json_stream
 from ..utils.proxy import ProxyConfig
 from ..utils.socket import consume_socket_output, demux_adaptor, frames_iter
 from .daemon import DaemonApiMixin
+from .info import InfoApiMixin
 
 try:
     from ..transport import NpipeHTTPAdapter
@@ -34,7 +35,8 @@ except ImportError:
 
 class APIClient(
         requests.Session,
-        DaemonApiMixin):
+        DaemonApiMixin,
+        InfoApiMixin):
     """
     A low-level client for the ipsw API.
 
