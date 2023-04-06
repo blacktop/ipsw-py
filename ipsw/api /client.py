@@ -7,7 +7,6 @@ import requests
 import requests.exceptions
 import websocket
 
-from .. import auth
 from ..constants import (DEFAULT_MAX_POOL_SIZE, DEFAULT_NUM_POOLS,
                          DEFAULT_NUM_POOLS_SSH, DEFAULT_TIMEOUT_SECONDS,
                          DEFAULT_USER_AGENT, IS_WINDOWS_PLATFORM,

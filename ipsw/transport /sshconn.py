@@ -8,7 +8,7 @@ import signal
 import socket
 import subprocess
 
-from ipsw.transport.basehttpadapter import BaseHTTPAdapter
+from .basehttpadapter import BaseHTTPAdapter
 from .. import constants
 
 import http.client as httplib

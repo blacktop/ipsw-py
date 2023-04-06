@@ -15,6 +15,16 @@
 
 ## `NOTE:` This is a work in progress ⚠️
 
+## Getting Started
+
+Start the `ipsw` daemon:
+
+```bash
+git clone -b feature/api https://github.com/blacktop/ipsw.git
+cd ipsw
+IPSW_DAEMON_PORT=8080 go run ./cmd/ipswd/main.go start
+```
+
 ## Installing
 
 The latest stable version is [available on PyPI](https://pypi.org/project/ipsw/). Either add `ipsw` to your `requirements.txt` file or install with **pip**:
@@ -28,7 +38,7 @@ pip install ipsw
 ```python
 import ipsw
 
-client = ipsw.from_env()
+client = ipsw.IpswClient(base_url='tcp://127.0.0.1:8080')
 info = client.ipsw_info("iPhone15,2_16.4_20E246_Restore.ipsw")
 print(info)
 ```

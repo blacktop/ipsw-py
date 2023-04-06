@@ -1,7 +1,7 @@
 import queue
 import requests.adapters
 
-from ipsw.transport.basehttpadapter import BaseHTTPAdapter
+from .basehttpadapter import BaseHTTPAdapter
 from .. import constants
 from .npipesocket import NpipeSocket
 

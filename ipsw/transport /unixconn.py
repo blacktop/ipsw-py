@@ -2,7 +2,7 @@ import requests.adapters
 import socket
 import http.client as httplib
 
-from ipsw.transport.basehttpadapter import BaseHTTPAdapter
+from .basehttpadapter import BaseHTTPAdapter
 from .. import constants
 
 try:
