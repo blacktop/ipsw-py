@@ -54,7 +54,7 @@ def load_general_config(config_path=None):
 
     try:
         with open(config_file) as f:
-            return yaml.load(f)
+            return yaml.safe_load(f)
     except (OSError, ValueError) as e:
         log.debug(e)
 

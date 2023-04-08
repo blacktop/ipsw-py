@@ -8,10 +8,27 @@ class IpswException(Exception):
     catch this base exception.
     """
 
+
+def create_api_error_from_http_exception(e):
+    """
+    Create a suitable APIError from requests.exceptions.HTTPError.
+    """
+    response = e.response
+    try:
+        explanation = response.json()["message"]
+    except ValueError:
+        explanation = (response.content or "").strip()
+    cls = APIError
+    if response.status_code == 404:
+        cls = NotFound
+    raise cls(e, response=response, explanation=explanation) from e
+
+
 class APIError(requests.exceptions.HTTPError, IpswException):
     """
     An HTTP error from the API.
     """
+
     def __init__(self, message, response=None, explanation=None):
         # requests 1.2 supports response as a keyword argument, but
         # requests 1.1 doesn't
@@ -23,14 +40,14 @@ class APIError(requests.exceptions.HTTPError, IpswException):
         message = super().__str__()
 
         if self.is_client_error():
-            message = '{} Client Error for {}: {}'.format(
-                self.response.status_code, self.response.url,
-                self.response.reason)
+            message = "{} Client Error for {}: {}".format(
+                self.response.status_code, self.response.url, self.response.reason
+            )
 
         elif self.is_server_error():
-            message = '{} Server Error for {}: {}'.format(
-                self.response.status_code, self.response.url,
-                self.response.reason)
+            message = "{} Server Error for {}: {}".format(
+                self.response.status_code, self.response.url, self.response.reason
+            )
 
         if self.explanation:
             message = f'{message} ("{self.explanation}")'
@@ -54,6 +71,13 @@ class APIError(requests.exceptions.HTTPError, IpswException):
         if self.status_code is None:
             return False
         return 500 <= self.status_code < 600
+
+
+class NotFound(APIError):
+    pass
+
+class InvalidVersion(IpswException):
+    pass
 
 
 class StreamParseError(RuntimeError):

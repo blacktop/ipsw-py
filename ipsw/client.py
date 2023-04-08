@@ -72,14 +72,6 @@ class IpswClient:
         )
 
     # Top-level methods
-    def events(self, *args, **kwargs):
-        return self.api.events(*args, **kwargs)
-    events.__doc__ = APIClient.events.__doc__
-
-    def info(self, *args, **kwargs):
-        return self.api.info(*args, **kwargs)
-    info.__doc__ = APIClient.info.__doc__
-
     def ping(self, *args, **kwargs):
         return self.api.ping(*args, **kwargs)
     ping.__doc__ = APIClient.ping.__doc__
