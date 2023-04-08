@@ -42,6 +42,9 @@ client = ipsw.IpswClient(base_url='tcp://127.0.0.1:8080')
 info = client.info.get("iPhone15,2_16.4_20E246_Restore.ipsw")
 print(f'{info.version} ({info.build})')
 ```
+```bash
+16.5 (20F5028e)
+```
 
 ## Community
 
