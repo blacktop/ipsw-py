@@ -1,5 +1,6 @@
 from .api.client import APIClient
 from .constants import (DEFAULT_TIMEOUT_SECONDS, DEFAULT_MAX_POOL_SIZE)
+from .models.info import InfoCollection
 from .utils import kwargs_from_env
 
 
@@ -71,11 +72,14 @@ class IpswClient:
             **kwargs_from_env(**kwargs)
         )
 
+    @property
+    def info(self):
+        """
+        An object for getting local/remote IPSW/OTA info.
+        """
+        return InfoCollection(client=self)
+
     # Top-level methods
-    def ipsw_info(self, *args, **kwargs):
-        return self.api.ipsw_info(*args, **kwargs)
-    ipsw_info.__doc__ = APIClient.ipsw_info.__doc__
-    
     def ping(self, *args, **kwargs):
         return self.api.ping(*args, **kwargs)
     ping.__doc__ = APIClient.ping.__doc__
