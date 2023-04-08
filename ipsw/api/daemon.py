@@ -72,7 +72,7 @@ class DaemonApiMixin:
         """
         return self._result(self._get(self._url('/_ping'))) == 'OK'
 
-    def version(self):
+    def version(self, api_version=True):
         """
         Returns version information from the server. Similar to the ``ipsw
         version`` command.
@@ -84,5 +84,5 @@ class DaemonApiMixin:
             :py:class:`ipsw.errors.APIError`
                 If the server returns an error.
         """
-        url = self._url("/version")
+        url = self._url("/version", versioned_api=api_version)
         return self._result(self._get(url), json=True)

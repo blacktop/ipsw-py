@@ -72,6 +72,10 @@ class IpswClient:
         )
 
     # Top-level methods
+    def ipsw_info(self, *args, **kwargs):
+        return self.api.ipsw_info(*args, **kwargs)
+    ipsw_info.__doc__ = APIClient.ipsw_info.__doc__
+    
     def ping(self, *args, **kwargs):
         return self.api.ping(*args, **kwargs)
     ping.__doc__ = APIClient.ping.__doc__
