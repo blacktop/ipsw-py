@@ -41,9 +41,12 @@ import ipsw
 client = ipsw.IpswClient(base_url='tcp://127.0.0.1:8080')
 info = client.info.get("iPhone15,2_16.5_20F5028e_Restore.ipsw")
 print(f'{info.version} ({info.build})')
+for device in info.devices:
+    print(f'- {device}')
 ```
 ```bash
 16.5 (20F5028e)
+- iPhone 14 Pro
 ```
 
 ## Community
