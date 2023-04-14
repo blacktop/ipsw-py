@@ -50,10 +50,13 @@ pip install ipsw
 
 ## Geting Started
 
+Get IPSW info
+
 ```python
 import ipsw
 
 client = ipsw.IpswClient(base_url='tcp://127.0.0.1:3993')
+
 info = client.info.get("iPhone15,2_16.5_20F5028e_Restore.ipsw")
 print(f'{info.version} ({info.build})')
 for device in info.devices:
@@ -62,6 +65,41 @@ for device in info.devices:
 ```bash
 16.5 (20F5028e)
 - iPhone 14 Pro
+```
+
+Get DSC info
+
+```python
+import ipsw
+
+client = ipsw.IpswClient(base_url='tcp://127.0.0.1:3993')
+
+dsc = client.dsc.get_info("20F5028e__iPhone15,2/dyld_shared_cache_arm64e")
+print(dsc)
+print(dsc.dylibs[0])
+
+dylib = client.dsc.get_dylib("20F5028e__iPhone15,2/dyld_shared_cache_arm64e", "libswiftCore.dylib")
+print(dylib)
+```
+```bash
+<DSC: '(dyld_v1  arm64e) - iOS - FAEC7714-4CCD-3B99-B18F-F5EAB60DE31E'>
+{'index': 1, 'name': '/usr/lib/libobjc.A.dylib', 'version': '876.0.0.0.0', 'uuid': '085A190C-6214-38EA-ACCB-428C3E8AFA65', 'load_address': 6443204608}
+
+<Dylib: '64-bit MachO AARCH64 (ARM64e)'>
+```
+
+Get MachO info
+
+```python
+import ipsw
+
+client = ipsw.IpswClient(base_url='tcp://127.0.0.1:3993')
+
+macho = client.macho.get("/bin/ls", arch="arm64e")
+print(macho)
+```
+```bash
+<Macho: '64-bit MachO AARCH64 (ARM64e)'>
 ```
 
 ## Community
