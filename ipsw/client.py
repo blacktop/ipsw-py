@@ -1,6 +1,7 @@
 from .api.client import APIClient
 from .constants import (DEFAULT_TIMEOUT_SECONDS, DEFAULT_MAX_POOL_SIZE)
 from .models.info import InfoCollection
+from .models.macho import MachoCollection
 from .utils import kwargs_from_env
 
 
@@ -78,6 +79,13 @@ class IpswClient:
         An object for getting local/remote IPSW/OTA info.
         """
         return InfoCollection(client=self)
+    
+    @property
+    def macho(self):
+        """
+        An object for getting MachO info.
+        """
+        return MachoCollection(client=self)
 
     # Top-level methods
     def ping(self, *args, **kwargs):

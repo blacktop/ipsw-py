@@ -19,10 +19,25 @@
 
 Start the `ipsw` daemon:
 
+### macOS
+
 ```bash
-git clone -b feature/api https://github.com/blacktop/ipsw.git
-cd ipsw
-IPSW_DAEMON_PORT=8080 go run ./cmd/ipswd/main.go start
+brew install blacktop/tap/ipswd
+brew services start blacktop/tap/ipswd
+```
+
+### Linux
+
+> ⚠️ UNTESTED ⚠️
+
+```bash
+sudo snap install ipswd
+```
+
+### Docker
+
+```bash
+docker run -d -p 3993:3993 -v `pwd`:/data blacktop/ipswd start
 ```
 
 ## Installing
@@ -38,7 +53,7 @@ pip install ipsw
 ```python
 import ipsw
 
-client = ipsw.IpswClient(base_url='tcp://127.0.0.1:8080')
+client = ipsw.IpswClient(base_url='tcp://127.0.0.1:3993')
 info = client.info.get("iPhone15,2_16.5_20F5028e_Restore.ipsw")
 print(f'{info.version} ({info.build})')
 for device in info.devices:
