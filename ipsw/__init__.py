@@ -3,4 +3,4 @@ from .api import APIClient
 from .client import IpswClient
 from .version import __version__
 
-__title__ = 'ipsw'
+__title__ = "ipsw"

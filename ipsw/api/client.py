@@ -7,18 +7,24 @@ import requests
 import requests.exceptions
 import websocket
 
-from ..constants import (DEFAULT_MAX_POOL_SIZE, DEFAULT_NUM_POOLS,
-                         DEFAULT_NUM_POOLS_SSH, DEFAULT_TIMEOUT_SECONDS,
-                         DEFAULT_USER_AGENT, IS_WINDOWS_PLATFORM,
-                         MINIMUM_IPSW_API_VERSION, STREAM_HEADER_SIZE_BYTES)
-from ..errors import (InvalidVersion, IpswException,
-                      create_api_error_from_http_exception)
+from ..constants import (
+    DEFAULT_MAX_POOL_SIZE,
+    DEFAULT_NUM_POOLS,
+    DEFAULT_NUM_POOLS_SSH,
+    DEFAULT_TIMEOUT_SECONDS,
+    DEFAULT_USER_AGENT,
+    IS_WINDOWS_PLATFORM,
+    MINIMUM_IPSW_API_VERSION,
+    STREAM_HEADER_SIZE_BYTES,
+)
+from ..errors import InvalidVersion, IpswException, create_api_error_from_http_exception
 from ..transport import UnixHTTPAdapter
 from ..utils import config, update_headers, utils
 from ..utils.json_stream import json_stream
 from ..utils.proxy import ProxyConfig
 from ..utils.socket import consume_socket_output, demux_adaptor, frames_iter
 from .daemon import DaemonApiMixin
+from .dsc import DscApiMixin
 from .info import InfoApiMixin
 from .macho import MachoApiMixin
 
@@ -33,11 +39,7 @@ except ImportError:
     pass
 
 
-class APIClient(
-        requests.Session,
-        DaemonApiMixin,
-        InfoApiMixin,
-        MachoApiMixin):
+class APIClient(requests.Session, DaemonApiMixin, DscApiMixin, InfoApiMixin, MachoApiMixin):
     """
     A low-level client for the ipsw API.
 
@@ -68,118 +70,98 @@ class APIClient(
             to save in the pool.
     """
 
-    __attrs__ = requests.Session.__attrs__ + ['_general_configs',
-                                              '_version',
-                                              'base_url',
-                                              'timeout']
+    __attrs__ = requests.Session.__attrs__ + ["_general_configs", "_version", "base_url", "timeout"]
 
-    def __init__(self, base_url=None, version=None,
-                 timeout=DEFAULT_TIMEOUT_SECONDS,
-                 user_agent=DEFAULT_USER_AGENT, num_pools=None,
-                 use_ssh_client=False,
-                 max_pool_size=DEFAULT_MAX_POOL_SIZE):
+    def __init__(
+        self,
+        base_url=None,
+        version=None,
+        timeout=DEFAULT_TIMEOUT_SECONDS,
+        user_agent=DEFAULT_USER_AGENT,
+        num_pools=None,
+        use_ssh_client=False,
+        max_pool_size=DEFAULT_MAX_POOL_SIZE,
+    ):
         super().__init__()
 
         self.base_url = base_url
         self.timeout = timeout
-        self.headers['User-Agent'] = user_agent
+        self.headers["User-Agent"] = user_agent
 
         self._general_configs = config.load_general_config()
 
-        proxy_config = self._general_configs.get('proxies', {})
+        proxy_config = self._general_configs.get("proxies", {})
         try:
             proxies = proxy_config[base_url]
         except KeyError:
-            proxies = proxy_config.get('default', {})
+            proxies = proxy_config.get("default", {})
 
         self._proxy_configs = ProxyConfig.from_dict(proxies)
 
         base_url = utils.parse_host(
-            base_url, IS_WINDOWS_PLATFORM,
+            base_url,
+            IS_WINDOWS_PLATFORM,
         )
         # SSH has a different default for num_pools to all other adapters
-        num_pools = num_pools or DEFAULT_NUM_POOLS_SSH if \
-            base_url.startswith('ssh://') else DEFAULT_NUM_POOLS
+        num_pools = num_pools or DEFAULT_NUM_POOLS_SSH if base_url.startswith("ssh://") else DEFAULT_NUM_POOLS
 
-        if base_url.startswith('http+unix://'):
+        if base_url.startswith("http+unix://"):
             self._custom_adapter = UnixHTTPAdapter(
-                base_url, timeout, pool_connections=num_pools,
-                max_pool_size=max_pool_size
+                base_url, timeout, pool_connections=num_pools, max_pool_size=max_pool_size
             )
-            self.mount('http+ipsw://', self._custom_adapter)
-            self._unmount('http://', 'https://')
+            self.mount("http+ipsw://", self._custom_adapter)
+            self._unmount("http://", "https://")
             # host part of URL should be unused, but is resolved by requests
             # module in proxy_bypass_macosx_sysconf()
-            self.base_url = 'http+ipsw://localhost'
-        elif base_url.startswith('npipe://'):
+            self.base_url = "http+ipsw://localhost"
+        elif base_url.startswith("npipe://"):
             if not IS_WINDOWS_PLATFORM:
-                raise IpswException(
-                    'The npipe:// protocol is only supported on Windows'
-                )
+                raise IpswException("The npipe:// protocol is only supported on Windows")
             try:
                 self._custom_adapter = NpipeHTTPAdapter(
-                    base_url, timeout, pool_connections=num_pools,
-                    max_pool_size=max_pool_size
+                    base_url, timeout, pool_connections=num_pools, max_pool_size=max_pool_size
                 )
             except NameError:
-                raise IpswException(
-                    'Install pypiwin32 package to enable npipe:// support'
-                )
-            self.mount('http+ipsw://', self._custom_adapter)
-            self.base_url = 'http+ipsw://localnpipe'
-        elif base_url.startswith('ssh://'):
+                raise IpswException("Install pypiwin32 package to enable npipe:// support")
+            self.mount("http+ipsw://", self._custom_adapter)
+            self.base_url = "http+ipsw://localnpipe"
+        elif base_url.startswith("ssh://"):
             try:
                 self._custom_adapter = SSHHTTPAdapter(
-                    base_url, timeout, pool_connections=num_pools,
-                    max_pool_size=max_pool_size, shell_out=use_ssh_client
+                    base_url, timeout, pool_connections=num_pools, max_pool_size=max_pool_size, shell_out=use_ssh_client
                 )
             except NameError:
-                raise IpswException(
-                    'Install paramiko package to enable ssh:// support'
-                )
-            self.mount('http+ipsw://ssh', self._custom_adapter)
-            self._unmount('http://', 'https://')
-            self.base_url = 'http+ipsw://ssh'
+                raise IpswException("Install paramiko package to enable ssh:// support")
+            self.mount("http+ipsw://ssh", self._custom_adapter)
+            self._unmount("http://", "https://")
+            self.base_url = "http+ipsw://ssh"
         else:
             self.base_url = base_url
 
         # version detection needs to be after unix adapter mounting
-        if version is None or (isinstance(
-                                version,
-                                str
-                                ) and version.lower() == 'auto'):
+        if version is None or (isinstance(version, str) and version.lower() == "auto"):
             self._version = self._retrieve_server_version()
         else:
             self._version = version
         if not isinstance(self._version, str):
-            raise IpswException(
-                'Version parameter must be a string or None. Found {}'.format(
-                    type(version).__name__
-                )
-            )
+            raise IpswException("Version parameter must be a string or None. Found {}".format(type(version).__name__))
         if utils.version_lt(self._version, MINIMUM_IPSW_API_VERSION):
             raise InvalidVersion(
-                'API versions below {} are no longer supported by this '
-                'library.'.format(MINIMUM_IPSW_API_VERSION)
+                "API versions below {} are no longer supported by this " "library.".format(MINIMUM_IPSW_API_VERSION)
             )
 
     def _retrieve_server_version(self):
         try:
             return self.version(api_version=False)["ApiVersion"]
         except KeyError:
-            raise IpswException(
-                'Invalid response from ipsw daemon: key "ApiVersion"'
-                ' is missing.'
-            )
+            raise IpswException('Invalid response from ipsw daemon: key "ApiVersion"' " is missing.")
         except Exception as e:
-            raise IpswException(
-                f'Error while fetching server API version: {e}'
-            )
+            raise IpswException(f"Error while fetching server API version: {e}")
 
     def _set_request_timeout(self, kwargs):
         """Prepare the kwargs for an HTTP request by inserting the timeout
         parameter, if not already present."""
-        kwargs.setdefault('timeout', self.timeout)
+        kwargs.setdefault("timeout", self.timeout)
         return kwargs
 
     @update_headers
@@ -201,20 +183,15 @@ class APIClient(
     def _url(self, pathfmt, *args, **kwargs):
         for arg in args:
             if not isinstance(arg, str):
-                raise ValueError(
-                    'Expected a string but found {} ({}) '
-                    'instead'.format(arg, type(arg))
-                )
+                raise ValueError("Expected a string but found {} ({}) " "instead".format(arg, type(arg)))
 
         quote_f = partial(urllib.parse.quote, safe="/:")
         args = map(quote_f, args)
 
-        if kwargs.get('versioned_api', True):
-            return '{}/v{}{}'.format(
-                self.base_url, self._version, pathfmt.format(*args)
-            )
+        if kwargs.get("versioned_api", True):
+            return "{}/v{}{}".format(self.base_url, self._version, pathfmt.format(*args))
         else:
-            return f'{self.base_url}{pathfmt.format(*args)}'
+            return f"{self.base_url}{pathfmt.format(*args)}"
 
     def _raise_for_status(self, response):
         """Raises stored :class:`APIError`, if one occurred."""
@@ -244,17 +221,13 @@ class APIClient(
         elif data is not None:
             data2 = data
 
-        if 'headers' not in kwargs:
-            kwargs['headers'] = {}
-        kwargs['headers']['Content-Type'] = 'application/json'
+        if "headers" not in kwargs:
+            kwargs["headers"] = {}
+        kwargs["headers"]["Content-Type"] = "application/json"
         return self._post(url, data=json.dumps(data2), **kwargs)
 
     def _attach_params(self, override=None):
-        return override or {
-            'stdout': 1,
-            'stderr': 1,
-            'stream': 1
-        }
+        return override or {"stdout": 1, "stderr": 1, "stream": 1}
 
     def _create_websocket_connection(self, url):
         return websocket.create_connection(url)
@@ -263,7 +236,7 @@ class APIClient(
         self._raise_for_status(response)
         if self.base_url == "http+ipsw://localnpipe":
             sock = response.raw._fp.fp.raw.sock
-        elif self.base_url.startswith('http+ipsw://ssh'):
+        elif self.base_url.startswith("http+ipsw://ssh"):
             sock = response.raw._fp.fp.channel
         else:
             sock = response.raw._fp.fp.raw
@@ -311,8 +284,8 @@ class APIClient(
         while True:
             if buf_length - walker < STREAM_HEADER_SIZE_BYTES:
                 break
-            header = buf[walker:walker + STREAM_HEADER_SIZE_BYTES]
-            _, length = struct.unpack_from('>BxxxL', header)
+            header = buf[walker : walker + STREAM_HEADER_SIZE_BYTES]
+            _, length = struct.unpack_from(">BxxxL", header)
             start = walker + STREAM_HEADER_SIZE_BYTES
             end = start + length
             walker = end
@@ -331,7 +304,7 @@ class APIClient(
             header = response.raw.read(STREAM_HEADER_SIZE_BYTES)
             if not header:
                 break
-            _, length = struct.unpack('>BxxxL', header)
+            _, length = struct.unpack(">BxxxL", header)
             if not length:
                 continue
             data = response.raw.read(length)
@@ -340,7 +313,7 @@ class APIClient(
             yield data
 
     def _stream_raw_result(self, response, chunk_size=1, decode=True):
-        ''' Stream result for TTY-enabled container and raw binary data'''
+        """Stream result for TTY-enabled container and raw binary data"""
         self._raise_for_status(response)
 
         # Disable timeout on the underlying socket to prevent
@@ -376,7 +349,7 @@ class APIClient(
                 response.close()
 
     def _disable_socket_timeout(self, socket):
-        """ Depending on the combination of python version and whether we're
+        """Depending on the combination of python version and whether we're
         connecting over http or https, we might need to access _sock, which
         may or may not exist; or we may need to just settimeout on socket
         itself, which also may or may not have settimeout on it. To avoid
@@ -386,15 +359,15 @@ class APIClient(
         you run the risk of changing a socket that was non-blocking to
         blocking, for example when using gevent.
         """
-        sockets = [socket, getattr(socket, '_sock', None)]
+        sockets = [socket, getattr(socket, "_sock", None)]
 
         for s in sockets:
-            if not hasattr(s, 'settimeout'):
+            if not hasattr(s, "settimeout"):
                 continue
 
             timeout = -1
 
-            if hasattr(s, 'gettimeout'):
+            if hasattr(s, "gettimeout"):
                 timeout = s.gettimeout()
 
             # Don't change the timeout if it is already disabled.

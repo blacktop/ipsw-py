@@ -76,6 +76,7 @@ class APIError(requests.exceptions.HTTPError, IpswException):
 class NotFound(APIError):
     pass
 
+
 class InvalidVersion(IpswException):
     pass
 

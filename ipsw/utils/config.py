@@ -4,17 +4,22 @@ import os
 
 from ..constants import IS_WINDOWS_PLATFORM
 
-IPSW_CONFIG_FILENAME = os.path.join('.config', 'ipsw', 'config.yml')
+IPSW_CONFIG_FILENAME = os.path.join(".config", "ipsw", "config.yml")
 
 log = logging.getLogger(__name__)
 
 
 def find_config_file(config_path=None):
-    paths = list(filter(None, [
-        config_path,  # 1
-        config_path_from_environment(),  # 2
-        os.path.join(home_dir(), IPSW_CONFIG_FILENAME),  # 3
-    ]))
+    paths = list(
+        filter(
+            None,
+            [
+                config_path,  # 1
+                config_path_from_environment(),  # 2
+                os.path.join(home_dir(), IPSW_CONFIG_FILENAME),  # 3
+            ],
+        )
+    )
 
     log.debug(f"Trying paths: {repr(paths)}")
 
@@ -29,7 +34,7 @@ def find_config_file(config_path=None):
 
 
 def config_path_from_environment():
-    config_dir = os.environ.get('IPSW_CONFIG')
+    config_dir = os.environ.get("IPSW_CONFIG")
     if not config_dir:
         return None
     return os.path.join(config_dir, os.path.basename(IPSW_CONFIG_FILENAME))
@@ -41,9 +46,9 @@ def home_dir():
     client - use %USERPROFILE% on Windows, $HOME/getuid on POSIX.
     """
     if IS_WINDOWS_PLATFORM:
-        return os.environ.get('USERPROFILE', '')
+        return os.environ.get("USERPROFILE", "")
     else:
-        return os.path.expanduser('~')
+        return os.path.expanduser("~")
 
 
 def load_general_config(config_path=None):

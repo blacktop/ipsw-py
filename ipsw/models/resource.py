@@ -2,7 +2,8 @@ class Model:
     """
     A base class for representing a single object on the server.
     """
-    id_attribute = 'Id'
+
+    id_attribute = "Id"
 
     def __init__(self, attrs=None, client=None, collection=None):
         #: A client pointing at the server that this object is on.
@@ -65,8 +66,8 @@ class Collection:
     def __call__(self, *args, **kwargs):
         raise TypeError(
             "'{}' object is not callable. You might be trying to use the old "
-            "(pre-2.0) API - use ipsw.APIClient if so."
-            .format(self.__class__.__name__))
+            "(pre-2.0) API - use ipsw.APIClient if so.".format(self.__class__.__name__)
+        )
 
     def list(self):
         raise NotImplementedError
@@ -88,5 +89,4 @@ class Collection:
         elif isinstance(attrs, dict):
             return self.model(attrs=attrs, client=self.client, collection=self)
         else:
-            raise Exception("Can't create %s from %s" %
-                            (self.model.__name__, attrs))
+            raise Exception("Can't create %s from %s" % (self.model.__name__, attrs))

@@ -48,26 +48,23 @@ class CancellableStream:
 
             sock_fp = self._response.raw._fp.fp
 
-            if hasattr(sock_fp, 'raw'):
+            if hasattr(sock_fp, "raw"):
                 sock_raw = sock_fp.raw
 
-                if hasattr(sock_raw, 'sock'):
+                if hasattr(sock_raw, "sock"):
                     sock = sock_raw.sock
 
-                elif hasattr(sock_raw, '_sock'):
+                elif hasattr(sock_raw, "_sock"):
                     sock = sock_raw._sock
 
-            elif hasattr(sock_fp, 'channel'):
+            elif hasattr(sock_fp, "channel"):
                 # We're working with a paramiko (SSH) channel, which doesn't
                 # support cancelable streams with the current implementation
-                raise IpswException(
-                    'Cancellable streams not supported for the SSH protocol'
-                )
+                raise IpswException("Cancellable streams not supported for the SSH protocol")
             else:
                 sock = sock_fp._sock
 
-            if hasattr(urllib3.contrib, 'pyopenssl') and isinstance(
-                    sock, urllib3.contrib.pyopenssl.WrappedSocket):
+            if hasattr(urllib3.contrib, "pyopenssl") and isinstance(sock, urllib3.contrib.pyopenssl.WrappedSocket):
                 sock = sock.socket
 
             sock.shutdown(socket.SHUT_RDWR)

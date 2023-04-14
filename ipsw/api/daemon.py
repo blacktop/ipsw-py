@@ -70,7 +70,7 @@ class DaemonApiMixin:
             :py:class:`ipsw.errors.APIError`
                 If the server returns an error.
         """
-        return self._result(self._get(self._url('/_ping'))) == 'OK'
+        return self._result(self._get(self._url("/_ping"))) == "OK"
 
     def version(self, api_version=True):
         """

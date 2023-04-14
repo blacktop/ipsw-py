@@ -15,11 +15,8 @@ RecentlyUsedContainer = urllib3._collections.RecentlyUsedContainer
 
 
 class UnixHTTPConnection(httplib.HTTPConnection):
-
     def __init__(self, base_url, unix_socket, timeout=60):
-        super().__init__(
-            'localhost', timeout=timeout
-        )
+        super().__init__("localhost", timeout=timeout)
         self.base_url = base_url
         self.unix_socket = unix_socket
         self.timeout = timeout
@@ -39,38 +36,32 @@ class UnixHTTPConnection(httplib.HTTPConnection):
 
 class UnixHTTPConnectionPool(urllib3.connectionpool.HTTPConnectionPool):
     def __init__(self, base_url, socket_path, timeout=60, maxsize=10):
-        super().__init__(
-            'localhost', timeout=timeout, maxsize=maxsize
-        )
+        super().__init__("localhost", timeout=timeout, maxsize=maxsize)
         self.base_url = base_url
         self.socket_path = socket_path
         self.timeout = timeout
 
     def _new_conn(self):
-        return UnixHTTPConnection(
-            self.base_url, self.socket_path, self.timeout
-        )
+        return UnixHTTPConnection(self.base_url, self.socket_path, self.timeout)
 
 
 class UnixHTTPAdapter(BaseHTTPAdapter):
+    __attrs__ = requests.adapters.HTTPAdapter.__attrs__ + ["pools", "socket_path", "timeout", "max_pool_size"]
 
-    __attrs__ = requests.adapters.HTTPAdapter.__attrs__ + ['pools',
-                                                           'socket_path',
-                                                           'timeout',
-                                                           'max_pool_size']
-
-    def __init__(self, socket_url, timeout=60,
-                 pool_connections=constants.DEFAULT_NUM_POOLS,
-                 max_pool_size=constants.DEFAULT_MAX_POOL_SIZE):
-        socket_path = socket_url.replace('http+unix://', '')
-        if not socket_path.startswith('/'):
-            socket_path = '/' + socket_path
+    def __init__(
+        self,
+        socket_url,
+        timeout=60,
+        pool_connections=constants.DEFAULT_NUM_POOLS,
+        max_pool_size=constants.DEFAULT_MAX_POOL_SIZE,
+    ):
+        socket_path = socket_url.replace("http+unix://", "")
+        if not socket_path.startswith("/"):
+            socket_path = "/" + socket_path
         self.socket_path = socket_path
         self.timeout = timeout
         self.max_pool_size = max_pool_size
-        self.pools = RecentlyUsedContainer(
-            pool_connections, dispose_func=lambda p: p.close()
-        )
+        self.pools = RecentlyUsedContainer(pool_connections, dispose_func=lambda p: p.close())
         super().__init__()
 
     def get_connection(self, url, proxies=None):
@@ -79,10 +70,7 @@ class UnixHTTPAdapter(BaseHTTPAdapter):
             if pool:
                 return pool
 
-            pool = UnixHTTPConnectionPool(
-                url, self.socket_path, self.timeout,
-                maxsize=self.max_pool_size
-            )
+            pool = UnixHTTPConnectionPool(url, self.socket_path, self.timeout, maxsize=self.max_pool_size)
             self.pools[url] = pool
 
         return pool

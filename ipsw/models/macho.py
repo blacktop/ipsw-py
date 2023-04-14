@@ -22,21 +22,28 @@ class Macho(Model):
         """
         The header magic.
         """
-        return self.attrs["info"]['header'].get("magic", None)
+        return self.attrs["info"]["header"].get("magic", None)
 
     @property
     def cpu(self):
         """
         The header CPU.
         """
-        return self.attrs["info"]['header'].get("cpu", None)
-    
+        return self.attrs["info"]["header"].get("cpu", None)
+
     @property
     def sub_cpu(self):
         """
         The header sub CPU.
         """
-        return self.attrs["info"]['header'].get("subcpu", None)
+        return self.attrs["info"]["header"].get("subcpu", None)
+
+    @property
+    def header(self):
+        """
+        The header.
+        """
+        return self.attrs["info"].get("header", None)
 
 
 class MachoCollection(Collection):

@@ -29,17 +29,17 @@ class Info(Model):
         The iOS version.
         """
         return self.attrs["info"]["Plists"]["restore"].get("ProductBuildVersion", None)
-    
+
     @property
     def devices(self):
         """
         The iOS devices.
         """
         devices = set()
-        for dt in self.attrs['info']['DeviceTrees'].values():
-            for child in dt['device-tree']['children']:
-                if 'product' in child:
-                    devices.add(child['product']['product-name'])
+        for dt in self.attrs["info"]["DeviceTrees"].values():
+            for child in dt["device-tree"]["children"]:
+                if "product" in child:
+                    devices.add(child["product"]["product-name"])
         devlist = list(devices)
         devlist.sort()
         return devlist

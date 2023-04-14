@@ -1,5 +1,6 @@
 from .api.client import APIClient
-from .constants import (DEFAULT_TIMEOUT_SECONDS, DEFAULT_MAX_POOL_SIZE)
+from .constants import DEFAULT_TIMEOUT_SECONDS, DEFAULT_MAX_POOL_SIZE
+from .models.dsc import DscCollection
 from .models.info import InfoCollection
 from .models.macho import MachoCollection
 from .utils import kwargs_from_env
@@ -27,6 +28,7 @@ class IpswClient:
         max_pool_size (int): The maximum number of connections
             to save in the pool.
     """
+
     def __init__(self, *args, **kwargs):
         self.api = APIClient(*args, **kwargs)
 
@@ -59,19 +61,26 @@ class IpswClient:
 
             >>> import ipsw
             >>> client = ipsw.from_env()
-            
+
         """
-        timeout = kwargs.pop('timeout', DEFAULT_TIMEOUT_SECONDS)
-        max_pool_size = kwargs.pop('max_pool_size', DEFAULT_MAX_POOL_SIZE)
-        version = kwargs.pop('version', None)
-        use_ssh_client = kwargs.pop('use_ssh_client', False)
+        timeout = kwargs.pop("timeout", DEFAULT_TIMEOUT_SECONDS)
+        max_pool_size = kwargs.pop("max_pool_size", DEFAULT_MAX_POOL_SIZE)
+        version = kwargs.pop("version", None)
+        use_ssh_client = kwargs.pop("use_ssh_client", False)
         return cls(
             timeout=timeout,
             max_pool_size=max_pool_size,
             version=version,
             use_ssh_client=use_ssh_client,
-            **kwargs_from_env(**kwargs)
+            **kwargs_from_env(**kwargs),
         )
+
+    @property
+    def dsc(self):
+        """
+        An object for getting DSC info.
+        """
+        return DscCollection(client=self)
 
     @property
     def info(self):
@@ -79,7 +88,7 @@ class IpswClient:
         An object for getting local/remote IPSW/OTA info.
         """
         return InfoCollection(client=self)
-    
+
     @property
     def macho(self):
         """
@@ -90,24 +99,29 @@ class IpswClient:
     # Top-level methods
     def ping(self, *args, **kwargs):
         return self.api.ping(*args, **kwargs)
+
     ping.__doc__ = APIClient.ping.__doc__
 
     def version(self, *args, **kwargs):
         return self.api.version(*args, **kwargs)
+
     version.__doc__ = APIClient.version.__doc__
 
     def close(self):
         return self.api.close()
+
     close.__doc__ = APIClient.close.__doc__
 
     def __getattr__(self, name):
         s = [f"'IpswClient' object has no attribute '{name}'"]
         # If a user calls a method on APIClient, they
         if hasattr(APIClient, name):
-            s.append("In ipsw SDK for Python 2.0, this method is now on the "
-                     "object APIClient. See the low-level API section of the "
-                     "documentation for more details.")
-        raise AttributeError(' '.join(s))
+            s.append(
+                "In ipsw SDK for Python 2.0, this method is now on the "
+                "object APIClient. See the low-level API section of the "
+                "documentation for more details."
+            )
+        raise AttributeError(" ".join(s))
 
 
 from_env = IpswClient.from_env

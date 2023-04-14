@@ -6,9 +6,10 @@ except ImportError:
         # is fine because release builds use _version (above) rather than
         # this code path, so it only impacts developing w/ 3.7
         from importlib.metadata import version, PackageNotFoundError
+
         try:
-            __version__ = version('ipsw')
+            __version__ = version("ipsw")
         except PackageNotFoundError:
-            __version__ = '0.0.0'
+            __version__ = "0.0.0"
     except ImportError:
-        __version__ = '0.0.0'
+        __version__ = "0.0.0"
