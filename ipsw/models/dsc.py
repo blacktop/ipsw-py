@@ -52,6 +52,54 @@ class DSC(Model):
         """
         return self.attrs.get("info", None)
 
+    @property
+    def path(self):
+        """
+        The DSC path.
+        """
+        return self.attrs.get("path", None)
+
+    def a2o(self, addr=0):
+        """
+        Convert address to offsest.
+        """
+        return self.client.api.dsc_a2o(self.path, addr)
+
+    def a2s(self, addrs=None, decode=False):
+        """
+        Lookup symbols for addresses.
+        """
+        return self.client.api.dsc_a2s(self.path, addrs, decode)
+
+    def o2a(self, off=0):
+        """
+        Convert offsest to address.
+        """
+        return self.client.api.dsc_o2a(self.path, off)
+
+    def dylib(self, dylib=None):
+        """
+        Get DSC dylib info.
+        """
+        return Dylib(
+            image_name=dylib,
+            attrs=self.client.api.dsc_macho(self.path, dylib),
+            client=self.client,
+            collection=self,
+        )
+
+    def sym_addrs(self, lookups=None):
+        """
+        Lookup symbols addresses.
+        """
+        return self.client.api.dsc_sym_addrs(self.path, lookups)
+
+    def slide_infos(self, auth=False, decode=False):
+        """
+        Get DSC slide info.
+        """
+        return self.client.api.dsc_slide_info(self.path, auth, decode)
+
 
 class Dylib(Model):
     """
@@ -106,22 +154,30 @@ class Dylib(Model):
         return self.attrs["macho"].get("loads", None)
 
 
+class Rebase(Model):
+    """
+    Rebase info.
+    """
+
+    def __repr__(self):
+        return "<{}: '{}'>".format(
+            self.__class__.__name__,
+            self.pointer,
+        )
+
+    @property
+    def pointer(self):
+        """
+        The rebase pointer.
+        """
+        return self.attrs.get("pointer", None)
+
+
 class DscCollection(Collection):
     model = DSC
 
-    def get_info(self, path=None):
+    def open(self, path=None):
         """
         Get DSC info.
         """
         return self.prepare_model(self.client.api.dsc_info(path))
-
-    def get_dylib(self, path=None, dylib=None):
-        """
-        Get DSC dylib info.
-        """
-        return Dylib(
-            image_name=dylib,
-            attrs=self.client.api.dsc_macho(path, dylib),
-            client=self.client,
-            collection=self,
-        )

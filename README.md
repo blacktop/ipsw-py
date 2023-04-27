@@ -74,19 +74,47 @@ import ipsw
 
 client = ipsw.IpswClient(base_url='tcp://127.0.0.1:3993')
 
-dsc = client.dsc.get_info("20F5028e__iPhone15,2/dyld_shared_cache_arm64e")
+dsc = client.dsc.open("20F5028e__iPhone15,2/dyld_shared_cache_arm64e")
 print(dsc)
 print(dsc.dylibs[0])
-
-dylib = client.dsc.get_dylib("20F5028e__iPhone15,2/dyld_shared_cache_arm64e", "libswiftCore.dylib")
-print(dylib)
 ```
-```bash
+```python
 <DSC: '(dyld_v1  arm64e) - iOS - FAEC7714-4CCD-3B99-B18F-F5EAB60DE31E'>
 {'index': 1, 'name': '/usr/lib/libobjc.A.dylib', 'version': '876.0.0.0.0', 'uuid': '085A190C-6214-38EA-ACCB-428C3E8AFA65', 'load_address': 6443204608}
 
 <Dylib: '64-bit MachO AARCH64 (ARM64e)'>
 ```
+
+Get dylib inside DSC info
+
+```py
+libswiftCore = dsc.dylib("libswiftCore.dylib")
+print(libswiftCore)
+```
+
+Get DSC symbol addresses
+
+```python
+syms = dsc.sym_addrs([{'pattern': '.*zero.*', 'image': 'libsystem_c.dylib'}])
+print(syms)
+```
+
+Convert between DSC offsets and addresses
+
+```python
+off = dsc.a2o(7624591060)
+adr = dsc.o2a(61146836)
+```
+
+Lookup DSC symbol by address
+
+```python
+print(next(dsc.a2s([7624591060])))
+```
+```json
+{"address":7624591060,"symbol":"__exit","demanged":"__exit","mapping":"__TEXT","uuid":"3AB55994-1201-3908-BE27-52BB7EFA7573","ext":".21","image":"/usr/lib/system/libsystem_kernel.dylib","section":"__text","segment":"__TEXT"}
+```
+
 
 Get MachO info
 
@@ -95,7 +123,7 @@ import ipsw
 
 client = ipsw.IpswClient(base_url='tcp://127.0.0.1:3993')
 
-macho = client.macho.get("/bin/ls", arch="arm64e")
+macho = client.macho.open("/bin/ls", arch="arm64e")
 print(macho)
 ```
 ```bash

@@ -152,9 +152,9 @@ class APIClient(requests.Session, DaemonApiMixin, DscApiMixin, InfoApiMixin, Mac
 
     def _retrieve_server_version(self):
         try:
-            return self.version(api_version=False)["ApiVersion"]
+            return self.version(api_version=False)["api_version"]
         except KeyError:
-            raise IpswException('Invalid response from ipsw daemon: key "ApiVersion"' " is missing.")
+            raise IpswException('Invalid response from ipsw daemon: key "api_version"' " is missing.")
         except Exception as e:
             raise IpswException(f"Error while fetching server API version: {e}")
 

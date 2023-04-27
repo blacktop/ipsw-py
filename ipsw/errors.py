@@ -15,7 +15,7 @@ def create_api_error_from_http_exception(e):
     """
     response = e.response
     try:
-        explanation = response.json()["message"]
+        explanation = response.json()["error"]
     except ValueError:
         explanation = (response.content or "").strip()
     cls = APIError

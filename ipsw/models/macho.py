@@ -45,11 +45,18 @@ class Macho(Model):
         """
         return self.attrs["info"].get("header", None)
 
+    @property
+    def path(self):
+        """
+        The DSC path.
+        """
+        return self.attrs.get("path", None)
+
 
 class MachoCollection(Collection):
     model = Macho
 
-    def get(self, path=None, arch=None):
+    def open(self, path=None, arch=None):
         """
         Get MachO info.
         """
