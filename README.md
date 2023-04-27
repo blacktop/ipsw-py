@@ -80,9 +80,9 @@ print(dsc.dylibs[0])
 ```
 ```python
 <DSC: '(dyld_v1  arm64e) - iOS - FAEC7714-4CCD-3B99-B18F-F5EAB60DE31E'>
+```
+```json
 {'index': 1, 'name': '/usr/lib/libobjc.A.dylib', 'version': '876.0.0.0.0', 'uuid': '085A190C-6214-38EA-ACCB-428C3E8AFA65', 'load_address': 6443204608}
-
-<Dylib: '64-bit MachO AARCH64 (ARM64e)'>
 ```
 
 Get dylib inside DSC info
@@ -90,6 +90,9 @@ Get dylib inside DSC info
 ```py
 libswiftCore = dsc.dylib("libswiftCore.dylib")
 print(libswiftCore)
+```
+```python
+<Dylib: '64-bit MachO AARCH64 (ARM64e)'>
 ```
 
 Get DSC symbol addresses
