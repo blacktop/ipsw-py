@@ -82,7 +82,13 @@ print(dsc.dylibs[0])
 <DSC: '(dyld_v1  arm64e) - iOS - FAEC7714-4CCD-3B99-B18F-F5EAB60DE31E'>
 ```
 ```json
-{'index': 1, 'name': '/usr/lib/libobjc.A.dylib', 'version': '876.0.0.0.0', 'uuid': '085A190C-6214-38EA-ACCB-428C3E8AFA65', 'load_address': 6443204608}
+{
+  "index": 1,
+  "name": "/usr/lib/libobjc.A.dylib",
+  "version": "876.0.0.0.0",
+  "uuid": "085A190C-6214-38EA-ACCB-428C3E8AFA65",
+  "load_address": 6443204608
+}
 ```
 
 Get dylib inside DSC info
@@ -115,7 +121,17 @@ Lookup DSC symbol by address
 print(next(dsc.a2s([7624591060])))
 ```
 ```json
-{"address":7624591060,"symbol":"__exit","demanged":"__exit","mapping":"__TEXT","uuid":"3AB55994-1201-3908-BE27-52BB7EFA7573","ext":".21","image":"/usr/lib/system/libsystem_kernel.dylib","section":"__text","segment":"__TEXT"}
+{
+  "address": 7624591060,
+  "symbol": "__exit",
+  "demanged": "__exit",
+  "mapping": "__TEXT",
+  "uuid": "3AB55994-1201-3908-BE27-52BB7EFA7573",
+  "ext": ".21",
+  "image": "/usr/lib/system/libsystem_kernel.dylib",
+  "section": "__text",
+  "segment": "__TEXT"
+}
 ```
 
 
